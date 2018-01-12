@@ -35,5 +35,22 @@ tbl.prev_sess_type = nominal(tbl.prev_sess_type);
 tbl.arm_stim = nominal(tbl.arm_stim);
 tbl.measure = nominal(tbl.measure);
 
+% remove X sessions
+tbl_all_sessions = tbl(tbl.SessType~='X',:);
+% verify
+session_names = unique(tbl.SessType);
+disp(session_names)
+
+% group stats
+[mean_list, std_list, cnt_list, grp_cell] = grpstats(tbl_all_sessions.value, ...
+	{tbl_all_sessions.Subj, tbl_all_sessions.arm_stim, tbl_all_sessions.measure}, ...
+	{'mean', 'std', 'numel', 'gname'});
+
+% columns of grp_cell = subj, arm_stim, measure
 out_tbl = table();
 
+for row = 1:length(mean_list)
+	out_tbl.subj = grp_cell{row, 1};
+	vname = [grp_cell{row,3} '_' grp_cell{row,2}];
+	out_tbl.(vname) = {};
+end
