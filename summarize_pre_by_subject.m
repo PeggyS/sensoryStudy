@@ -36,3 +36,4 @@ tbl.arm_stim = nominal(tbl.arm_stim);
 tbl.measure = nominal(tbl.measure);
 
 out_tbl = table();
+
