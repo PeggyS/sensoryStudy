@@ -3,11 +3,6 @@ function summarize_pre_by_subject(varargin)
 % define input parser
 p = inputParser;
 p.addParameter('file', 'none', @isstr);
-p.addParameter('exclude', {}, @iscell);
-p.addParameter('measure',{'x2pt_dig2', 'x2pt_dig4', ...
-	'monofil_dig2_local' 'monofil_dig4_local', ...
-	'proprioception_index_pct', ...
-	'vibr_dig2_avg' }, @iscell);
 p.addParameter('arm', {'un', 'inv'}, @iscell);
 
 
@@ -15,7 +10,7 @@ p.addParameter('arm', {'un', 'inv'}, @iscell);
 % parse the input
 p.parse(varargin{:});
 inputs = p.Results;
-if strcmp(inputs.file, 'none'),		% no file specified
+if strcmp(inputs.file, 'none')		% no file specified
 	% request the data file
 	[fname, pathname] = uigetfile('*.xlsx', 'Pick session_order_and_previous.xlsx file');
 	if isequal(fname,0) || isequal(pathname,0)
@@ -47,10 +42,34 @@ disp(session_names)
 	{'mean', 'std', 'numel', 'gname'});
 
 % columns of grp_cell = subj, arm_stim, measure
-out_tbl = table();
+out_tbl = table();	% 1 row for each subject: mean, std, cnt for each measure as variables
+out_tbl.subj = unique(grp_cell(:,1));
 
-for row = 1:length(mean_list)
-	out_tbl.subj = grp_cell{row, 1};
-	vname = [grp_cell{row,3} '_' grp_cell{row,2}];
-	out_tbl.(vname) = {};
+for row = 1:length(mean_list)  % go through each row of the grpstats output matrices
+	% find the row for this subj
+	subj_ind = find(strcmp(out_tbl.subj, grp_cell{row,1}));
+	
+	if subj_ind>1
+% 		keyboard
+	end
+	vname = [grp_cell{row,3} '_' grp_cell{row,2} '_mean'];
+	if ~sum(strcmp(out_tbl.Properties.VariableNames, vname)) % new variable name, add it as nans for all subj
+		out_tbl.(vname) = nan(height(out_tbl),1);
+	end
+	out_tbl.(vname)(subj_ind) = mean_list(row);
+	
+	vname = [grp_cell{row,3} '_' grp_cell{row,2} '_std'];
+	if ~sum(strcmp(out_tbl.Properties.VariableNames, vname)) % new variable name, add it as nans for all subj
+		out_tbl.(vname) = nan(height(out_tbl),1);
+	end
+	out_tbl.(vname)(subj_ind) = std_list(row);
+	
+	vname = [grp_cell{row,3} '_' grp_cell{row,2} '_n'];
+	if ~sum(strcmp(out_tbl.Properties.VariableNames, vname)) % new variable name, add it as nans for all subj
+		out_tbl.(vname) = nan(height(out_tbl),1);
+	end
+	out_tbl.(vname)(subj_ind) = cnt_list(row);
 end
+keyboard
+writetable(out_tbl,'pre_summary_by_subj_all_sessions.csv')
+
