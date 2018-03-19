@@ -1,4 +1,4 @@
-function sess_tbl = sep_scatter_bar_plot(varargin)
+function data_tbl = sep_scatter_bar_plot(varargin)
 %SEP_SCATTER_BAR_PLOT - plot of the data in sep_data_format_pre_post_diff.xlsx
 %
 % sep_data_format_pre_post_diff.xlsx is created with sep_format_avg_data
@@ -106,7 +106,10 @@ for m_cnt = 1:length(inputs.measures);
 						otherwise
 							error('unkown glove parameter: %s', g_str)
 					end
-					figure
+					h_fig = figure;
+					h = datacursormode(h_fig);
+					set(h,'UpdateFcn',@myupdatefcn,'SnapToDataVertex','on');
+					datacursormode on
 					scatter_bar(data_tbl)
 					set(gca, 'FontSize',14, 'FontWeight', 'normal', 'LineWidth',2);
 					ylabel( strrep(post_var_str, '_', '\_ '), 'FontWeight', 'normal')
@@ -128,8 +131,9 @@ offset_incr = 1/10;
 
 % each session is a different x value
 for sessInd = 1:length(sess_List)
-	uniq_vals = unique(tbl.(sess_List{sessInd}));
-	uniq_vals(isnan(uniq_vals))=[]; % remove nans
+	[uniq_vals, tbl_ind, uniq_ind] = unique(tbl.(sess_List{sessInd}));
+ 	uniq_vals(isnan(uniq_vals))=[]; % remove nans
+
 	counts = hist(tbl.(sess_List{sessInd}), uniq_vals);
 	
 	n(sessInd) = sum(counts); % total number of points/subjects
@@ -141,6 +145,10 @@ for sessInd = 1:length(sess_List)
 	for ii = 1:length(uniq_vals)
 		if counts(ii) > 0 && ~isnan(uniq_vals(ii))
 			% there's at least 1 point to plot
+			
+			% find the subjs
+			subj_ind = find(tbl.(sess_List{sessInd}) == uniq_vals(ii));
+			assert(length(subj_ind) == counts(ii), 'did not find %d subjects with uniq_val=%f',counts(ii), uniq_vals(ii))
 			
 			% offsets for additional points
 			if rem(counts(ii),2) == 1, % odd number of points
@@ -165,10 +173,22 @@ for sessInd = 1:length(sess_List)
 					l_offset = l_offset - offset_incr;
 				end
 				line(sessInd+offset, uniq_vals(ii), 'Marker', 'o', 'MarkerFaceColor', 'b', ...
-					'MarkerSize', 10);
+					'MarkerSize', 10, 'UserData', tbl.Subj(subj_ind(jj)));
 			end
 		end
 	end
 end
 set(gca, 'XTick', 1:length(sess_List), 'XTickLabel', strrep(sess_List, '_', '-'))
+return
+
+function [txt] = myupdatefcn(obj,event_obj)
+% Display 'Time' and 'Amplitude'
+pos = get(event_obj,'Position');
+hLine = get(event_obj, 'Target');
+xdata = get(hLine, 'XData');
+ydata = get(hLine, 'YData');
+labeldata = get(hLine, 'UserData');
+a=find(abs(xdata-pos(1))< eps & abs(ydata-pos(2))< eps);
+
+txt = {char(labeldata),	['Y: ',num2str(pos(2))]};
 return
