@@ -38,7 +38,9 @@ sep_tbl = sep_tbl(sep_tbl.SessType=='Hs' | sep_tbl.SessType=='Ha' | sep_tbl.Sess
 	| sep_tbl.SessType=='Hs-g' | sep_tbl.SessType=='Ha-g' | sep_tbl.SessType=='L-g',: );
 sep_tbl.Date = datetime(sep_tbl.datestr);
 sep_var_list = {'N20Cc', 'P25Cc', 'N33Cc', 'P45Cc', 'N60Cc' ,'P100Cc', 'N120Cc', ...
-	'N20Cc_P25Cc', 'P25Cc_N33Cc', 'N33Cc_P45Cc', 'P45Cc_N60Cc', 'N60Cc_P100Cc', 'P100Cc_N120Cc'};
+	'N20Cc_P25Cc', 'P25Cc_N33Cc', 'N33Cc_P45Cc', 'P45Cc_N60Cc', 'N60Cc_P100Cc', 'P100Cc_N120Cc',...
+	'N20Ci', 'P25Ci', 'N33Ci', 'P45Ci', 'N60Ci' ,'P100Ci', 'N120Ci', ...
+	'N20Ci_P25Ci', 'P25Ci_N33Ci', 'N33Ci_P45Ci', 'P45Ci_N60Ci', 'N60Ci_P100Ci', 'P100Ci_N120Ci'};
 
 
 s24_c_tbl = clinical_tbl(strcmp(clinical_tbl.Subj, 's2624sens'),:);
