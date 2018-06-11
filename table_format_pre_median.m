@@ -68,8 +68,8 @@ out_tbl = cell2table(inputs.measures', 'VariableNames', {'Measure'});
 	
 pre_tbl = tbl(tbl.arm==arm & tbl.pre_post=='pre' , : );
 pre_data = table2array(pre_tbl(:,6:end));
-pre_mean = mean(pre_data, 'omitnan');
-pre_sd   = std(pre_data, 'omitnan');
+pre_mean = median(pre_data, 'omitnan');
+pre_sd   = iqr(pre_data);
 pre_cnt  = sum(~isnan(pre_data));
 
 pre_mean_sd = format_with_parens(pre_mean, pre_sd);
@@ -95,8 +95,8 @@ for sess_cnt = 1:length(sess_list)
 		
 	pre_sess_tbl = tbl(tbl.arm==arm & tbl.session_num==sess & tbl.pre_post=='pre' , : );
 	pre_sess_data = table2array(pre_sess_tbl(:,6:end));
-	pre_sess_mean = mean(pre_sess_data, 'omitnan');
-	pre_sess_sd   = std(pre_sess_data, 'omitnan');
+	pre_sess_mean = median(pre_sess_data, 'omitnan');
+	pre_sess_sd   = iqr(pre_sess_data);
 	pre_sess_cnt  = sum(~isnan(pre_sess_data));
 	
 	pre_sess_mean_sd = format_with_parens(pre_sess_mean, pre_sess_sd);
@@ -108,7 +108,7 @@ for sess_cnt = 1:length(sess_list)
 end
 
 
-writetable(out_tbl, ['pre_mean_table_' arm '.csv'])
+writetable(out_tbl, ['pre_median_table_' arm '.csv'])
 
 return
 

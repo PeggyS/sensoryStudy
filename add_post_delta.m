@@ -78,6 +78,12 @@ if isequal(fName, 0) || isequal(pathName, 0)
 	disp('Not saving. User canceled.');
 	return;
 end
+
+% if session_num is a variable, turn it back into a number
+sn_ind = strfind(comb_tbl.Properties.VariableNames, 'session_num');
+if any(~cellfun(@isempty,sn_ind))
+	comb_tbl.session_num = double(comb_tbl.session_num);
+end
 writetable(comb_tbl, fullfile(pathName, fName));
 
 return
